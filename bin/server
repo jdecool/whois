@@ -1,0 +1,11 @@
+#!/usr/bin/env php
+<?php
+
+use function JDecool\Whois\Server\bootstrap;
+
+require __DIR__.'/../vendor/autoload.php';
+
+bootstrap(
+    getenv('IP') ?: '127.0.0.1',
+    (int) (getenv('PORT') ?: '80'),
+)->run();
