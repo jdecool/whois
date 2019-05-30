@@ -67,7 +67,7 @@ final class WhoisClient
     private function findDomainNicServer(string $domain): string
     {
         foreach ($this->servers as $regex => $host) {
-            if (preg_match("/$regex/", $domain)) {
+            if (@preg_match("/$regex/", $domain)) {
                 return $host;
             }
         }
