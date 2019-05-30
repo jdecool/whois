@@ -4,30 +4,22 @@ declare(strict_types=1);
 
 namespace JDecool\Whois;
 
-use JDecool\Whois\Exception\InvalidDomain;
+use JDecool\Whois\Exception\{
+    InvalidDomain,
+    RuntimeException,
+};
 
 final class WhoisClient
 {
     private const TIMEOUT = 30; // in seconds
 
-    private Socket $socket;
-    private string $host;
-    private int $port;
+    private SocketFactory $socketFactory;
+    private array $servers;
 
-    public static function create(string $host, int $port = 43): self
+    public function __construct(SocketFactory $socketFactory, array $servers)
     {
-        return new self(
-            Socket::openTcpV4Connection(),
-            $host,
-            $port,
-        );
-    }
-
-    public function __construct(Socket $socket, string $host, int $port = 43)
-    {
-        $this->socket = $socket;
-        $this->host = $host;
-        $this->port = $port;
+        $this->socketFactory = $socketFactory;
+        $this->servers = $servers;
     }
 
     public function whois(string $domain): string
@@ -36,12 +28,14 @@ final class WhoisClient
             throw new InvalidDomain($domain);
         }
 
-        $this->socket->connect($this->host, $this->port);
-        $this->socket->write("$domain\r\n");
+        $nicServer = $this->findDomainNicServer($domain);
+
+        $socket = $this->socketFactory->open($nicServer, 43);
+        $socket->write("$domain\r\n");
 
         $response = '';
-        while ($this->socket->selectRead(self::TIMEOUT)) {
-            $recv = $this->socket->read(8192);
+        while ($socket->selectRead(self::TIMEOUT)) {
+            $recv = $socket->read(8192);
             if ('' === $recv) {
                 return trim($response);
             }
@@ -50,5 +44,16 @@ final class WhoisClient
         }
 
         return $response;
+    }
+
+    private function findDomainNicServer(string $domain): string
+    {
+        foreach ($this->servers as $regex => $host) {
+            if (preg_match("/$regex/", $domain)) {
+                return $host;
+            }
+        }
+
+        throw new RuntimeException();
     }
 }
