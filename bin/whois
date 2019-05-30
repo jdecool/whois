@@ -5,4 +5,8 @@ use function JDecool\Whois\Cli\bootstrap;
 
 require __DIR__.'/../vendor/autoload.php';
 
-bootstrap()->run();
+$defaultConfigurationFile = realpath(__DIR__.'/../conf/servers.json');
+
+bootstrap(
+    getenv('CONFIGURATION_FILE') ?: $defaultConfigurationFile,
+)->run();
