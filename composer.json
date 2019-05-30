@@ -25,9 +25,11 @@
     },
     "require": {
         "php": "^7.4",
+        "ext-json": "^1.7",
         "ext-sockets": "*",
+        "react/http": "^0.8.4",
         "symfony/console": "^4.2",
-        "react/http": "^0.8.4"
+        "thecodingmachine/safe": "^0.1.15"
     },
     "require-dev": {
         "phpunit/phpunit": "^8.0"

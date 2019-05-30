@@ -8,6 +8,10 @@ use JDecool\Whois\Exception\{
     InvalidDomain,
     RuntimeException,
 };
+use function Safe\{
+    file_get_contents,
+    json_decode,
+};
 
 final class WhoisClient
 {
@@ -15,6 +19,20 @@ final class WhoisClient
 
     private SocketFactory $socketFactory;
     private array $servers;
+
+    /**
+     * @throws \Safe\Exceptions\FilesystemException
+     * @throws \Safe\Exceptions\JsonException
+     */
+    public static function fromConfiguration(string $file, ?SocketFactory $socketFactory = null): self
+    {
+        $content = file_get_contents($file);
+
+        return new self(
+            $socketFactory ?? new SocketFactory(),
+            json_decode($content, true),
+        );
+    }
 
     public function __construct(SocketFactory $socketFactory, array $servers)
     {
