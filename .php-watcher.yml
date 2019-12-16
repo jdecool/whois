@@ -1,0 +1,10 @@
+watch:
+    - bin
+    - src
+    - config
+extensions:
+    - php
+    - yaml
+    - yml
+ignore:
+    - tests
