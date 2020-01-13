@@ -5,12 +5,19 @@ declare(strict_types=1);
 namespace JDecool\Whois\Server;
 
 use JDecool\Whois\WhoisClient;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use React\EventLoop\Factory;
-use React\EventLoop\LoopInterface;
-use React\Http\Response;
-use React\Http\Server;
+use JsonException;
+use Psr\Http\{
+    Message\ResponseInterface,
+    Message\ServerRequestInterface,
+};
+use React\EventLoop\{
+    Factory,
+    LoopInterface,
+};
+use React\Http\{
+    Response,
+    Server,
+};
 use React\Socket\Server as Socket;
 
 class HttpServer
@@ -41,12 +48,13 @@ class HttpServer
         }
 
         if ('POST' !== $request->getMethod()) {
-            return new Response(400);
+            return new Response(400, ['Content-Type' => 'text/plain'], 'Invalid HTTP method');
         }
 
-        $data = $request->getParsedBody();
-        if (!isset($data['domain'])) {
-            return new Response(400);
+        try {
+            $data = json_decode($request->getBody()->getContents(), true, JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            return new Response(400, ['Content-Type' => 'text/plain'], "Invalid request ({$e->getMessage()})");
         }
 
         return new Response(200, ['Content-Type' => 'text/plain'], $this->client->whois($data['domain']));
