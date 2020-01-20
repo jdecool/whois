@@ -40,6 +40,10 @@ class HttpServer
         $this->socket = new Socket(sprintf('%s:%d', $ip, $port), $this->loop);
 
         $this->dispatcher = simpleDispatcher(function(RouteCollector $routes) {
+            $routes->addRoute('GET', '/', static function(ServerRequestInterface $request): ResponseInterface {
+                return new Response(200, ['Content-Type' => 'text/plain'], "Service is running");
+            });
+
             $routes->addRoute('POST', '/whois', function(ServerRequestInterface $request): ResponseInterface {
                 try {
                     $data = json_decode($request->getBody()->getContents(), true, JSON_THROW_ON_ERROR);
