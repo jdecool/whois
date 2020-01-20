@@ -24,6 +24,7 @@ use React\Http\{
     Server,
 };
 use React\Socket\Server as Socket;
+use Throwable;
 use function FastRoute\simpleDispatcher;
 
 class HttpServer
@@ -44,9 +45,24 @@ class HttpServer
                     $data = json_decode($request->getBody()->getContents(), true, JSON_THROW_ON_ERROR);
                 } catch (JsonException $e) {
                     return new Response(400, ['Content-Type' => 'text/plain'], "Invalid request ({$e->getMessage()})");
+                } catch (Throwable $e) {
+                    return new Response(500, ['Content-Type' => 'text/plain'], "Internal Server Error ({$e->getMessage()})");
                 }
 
-                return new Response(200, ['Content-Type' => 'text/plain'], $this->client->whois($data['domain']));
+                if (!isset($data['domain'])) {
+                    return new Response(400, ['Content-Type' => 'text/plain'], "Missing domain key");
+                }
+
+                $domain = parse_url($data['domain'], PHP_URL_HOST);
+                if (!is_string($domain)) {
+                    return new Response(400, ['Content-Type' => 'text/plain'], "Invalid domain");
+                }
+
+                try {
+                    return new Response(200, ['Content-Type' => 'text/plain'], $this->client->whois($domain));
+                } catch (Throwable $e) {
+                    return new Response(500, ['Content-Type' => 'text/plain'], "Internal Server Error ({$e->getMessage()})");
+                }
             });
         });
     }
