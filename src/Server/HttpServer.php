@@ -44,6 +44,10 @@ class HttpServer
                 return new Response(200, ['Content-Type' => 'text/plain'], "Service is running");
             });
 
+            $routes->addRoute('GET', '/ip', static function(ServerRequestInterface $request): ResponseInterface {
+                return new Response(200, ['Content-Type' => 'text/plain'], $request->getServerParams()['REMOTE_ADDR'] ?? 'Unknow');
+            });
+
             $routes->addRoute('POST', '/whois', function(ServerRequestInterface $request): ResponseInterface {
                 try {
                     $data = json_decode($request->getBody()->getContents(), true, JSON_THROW_ON_ERROR);
