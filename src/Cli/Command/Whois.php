@@ -32,5 +32,7 @@ final class Whois extends Command
         $output->writeln(
             $this->client->whois($input->getArgument('domain'))
         );
+
+        return 0;
     }
 }
