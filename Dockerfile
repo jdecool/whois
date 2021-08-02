@@ -1,4 +1,4 @@
-FROM php:7.4-cli-alpine
+FROM php:8.1.0beta1-cli-alpine3.14
 
 ENV IP=0.0.0.0
 ENV PORT=80

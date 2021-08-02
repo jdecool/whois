@@ -23,7 +23,7 @@ use React\EventLoop\{
     LoopInterface,
 };
 use React\Http\{
-    Response,
+    Message\Response,
     Server,
 };
 use React\Socket\Server as Socket;

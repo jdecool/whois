@@ -6,6 +6,7 @@ namespace JDecool\Whois;
 
 use JDecool\Whois\Exception\InvalidArgumentException;
 use JDecool\Whois\Exception\RuntimeException;
+use Socket as PhpSocket;
 
 final class Socket
 {
@@ -21,12 +22,8 @@ final class Socket
         return new self($socket);
     }
 
-    public function __construct($resource)
+    public function __construct(PhpSocket $resource)
     {
-        if (!is_resource($resource)) {
-            throw new InvalidArgumentException();
-        }
-
         $this->resource = $resource;
     }
 

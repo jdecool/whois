@@ -15,6 +15,10 @@ final class DnsClient
             throw new InvalidDomain($domain);
         }
 
-        return (new Dns($domain))->getRecords();
+        $records = (new Dns())->getRecords($domain);
+
+        return trim(
+            array_reduce($records, static fn (string $output, string $record): string => $output.$record.PHP_EOL, ''),
+        );
     }
 }
