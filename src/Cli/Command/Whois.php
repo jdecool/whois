@@ -5,20 +5,19 @@ declare(strict_types=1);
 namespace JDecool\Whois\Cli\Command;
 
 use JDecool\Whois\WhoisClient;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\{
+    Command\Command,
+    Input\InputArgument,
+    Input\InputInterface,
+    Output\OutputInterface,
+};
 
 final class Whois extends Command
 {
-    private WhoisClient $client;
-
-    public function __construct(WhoisClient $client)
-    {
+    public function __construct(
+        private WhoisClient $client,
+    ) {
         parent::__construct('whois');
-
-        $this->client = $client;
     }
 
     protected function configure()

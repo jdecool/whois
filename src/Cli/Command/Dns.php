@@ -5,20 +5,19 @@ declare(strict_types=1);
 namespace JDecool\Whois\Cli\Command;
 
 use JDecool\Whois\DnsClient;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\{
+    Command\Command,
+    Input\InputArgument,
+    Input\InputInterface,
+    Output\OutputInterface,
+};
 
 final class Dns extends Command
 {
-    private DnsClient $client;
-
-    public function __construct(DnsClient $client)
-    {
+    public function __construct(
+        private DnsClient $client,
+    ) {
         parent::__construct('dns');
-
-        $this->client = $client;
     }
 
     protected function configure()

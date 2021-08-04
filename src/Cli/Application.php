@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace JDecool\Whois\Cli;
 
-use JDecool\Whois\Cli\Command;
-use JDecool\Whois\DnsClient;
-use JDecool\Whois\WhoisClient;
+use JDecool\Whois\{
+    Cli\Command,
+    DnsClient,
+    WhoisClient,
+};
 use Symfony\Component\Console\Application as BaseApplication;
 
 final class Application extends BaseApplication

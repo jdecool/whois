@@ -9,11 +9,12 @@ use JDecool\Whois\{
     SocketFactory,
     WhoisClient,
 };
+use Spatie\Dns\Dns;
 
 function bootstrap(string $configurationFile): Application
 {
     return new Application(
         WhoisClient::fromConfiguration($configurationFile, new SocketFactory()),
-        new DnsClient(),
+        new DnsClient(new Dns()),
     );
 }

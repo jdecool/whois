@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace JDecool\Whois;
 
-use JDecool\Whois\Exception\InvalidArgumentException;
 use JDecool\Whois\Exception\RuntimeException;
 use Socket as PhpSocket;
 
 final class Socket
 {
-    private $resource;
-
     public static function openTcpV4Connection(): self
     {
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -22,9 +19,9 @@ final class Socket
         return new self($socket);
     }
 
-    public function __construct(PhpSocket $resource)
-    {
-        $this->resource = $resource;
+    public function __construct(
+        private PhpSocket $resource,
+    ) {
     }
 
     public function connect(string $host, int $port): void

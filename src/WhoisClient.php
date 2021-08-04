@@ -17,9 +17,6 @@ final class WhoisClient
 {
     private const TIMEOUT = 30; // in seconds
 
-    private SocketFactory $socketFactory;
-    private array $servers;
-
     /**
      * @throws \Safe\Exceptions\FilesystemException
      * @throws \Safe\Exceptions\JsonException
@@ -34,10 +31,10 @@ final class WhoisClient
         );
     }
 
-    public function __construct(SocketFactory $socketFactory, array $servers)
-    {
-        $this->socketFactory = $socketFactory;
-        $this->servers = $servers;
+    public function __construct(
+        private SocketFactory $socketFactory,
+        private array $servers,
+    ) {
     }
 
     public function whois(string $domain): string
