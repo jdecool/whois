@@ -18,10 +18,7 @@ use Psr\Http\{
     Message\ResponseInterface,
     Message\ServerRequestInterface,
 };
-use React\EventLoop\{
-    Factory,
-    LoopInterface,
-};
+use React\EventLoop\LoopInterface;
 use React\Http\{
     Message\Response,
     Server,
@@ -32,21 +29,26 @@ use function FastRoute\simpleDispatcher;
 
 class HttpServer
 {
-    private LoopInterface $loop;
-    private Socket $socket;
-    private WhoisClient $client;
-    private DnsClient $dns;
+    private Dispatcher $dispatcher;
 
-    public function __construct(WhoisClient $client, DnsClient $dns, string $ip = '0.0.0.0', int $port = 8000)
-    {
-        $this->client = $client;
-        $this->dns = $dns;
-        $this->loop = Factory::create();
-        $this->socket = new Socket(sprintf('%s:%d', $ip, $port), $this->loop);
+    public function __construct(
+        private Socket $socket,
+        private LoopInterface $loop,
+        private WhoisClient $client,
+        private DnsClient $dns,
+        callable $templateResolver,
+    ) {
+        $this->dispatcher = simpleDispatcher(function(RouteCollector $routes) use ($templateResolver) {
+            $routes->addRoute('GET', '/', static function(ServerRequestInterface $request) use ($templateResolver): ResponseInterface {
+                try {
+                    return new Response(200, ['Content-Type' => 'text/html'], $templateResolver('index.html'));
+                } catch (Throwable $e) {
+                    return new Response(500, ['Content-Type' => 'text/plain'], $e->getMessage());
+                }
+            });
 
-        $this->dispatcher = simpleDispatcher(function(RouteCollector $routes) {
-            $routes->addRoute('GET', '/', static function(ServerRequestInterface $request): ResponseInterface {
-                return new Response(200, ['Content-Type' => 'text/plain'], "Service is running");
+            $routes->addRoute('GET', '/favico.png', static function(ServerRequestInterface $request) use ($templateResolver): ResponseInterface {
+                return new Response(200, ['Content-Type' => 'image/png'], $templateResolver('favico.png'));
             });
 
             $routes->addRoute('POST', '/dns', function(ServerRequestInterface $request): ResponseInterface {
@@ -112,6 +114,8 @@ class HttpServer
                 case Dispatcher::FOUND:
                     $params = $route[2];
                     return $route[1]($request, ... array_values($params));
+                case Dispatcher::METHOD_NOT_ALLOWED:
+                    return new Response(405, ['Content-Type' => 'text/plain'], 'Method not allowed');
             }
 
             throw new LogicException('Something wrong with routing');

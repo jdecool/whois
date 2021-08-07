@@ -9,6 +9,7 @@ $defaultConfigurationFile = realpath(__DIR__.'/../conf/servers.json');
 
 bootstrap(
     getenv('CONFIGURATION_FILE') ?: $defaultConfigurationFile,
+    realpath(__DIR__.'/../public'),
     getenv('IP') ?: '127.0.0.1',
     (int) (getenv('PORT') ?: '80'),
 )->run();

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" type="image/png" href="favico.png" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <title>Network tools</title>
+        <style>
+            #myTabContent {
+                padding: 2em 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="px-4 my-5 text-center">
+            <h1 class="display-5 fw-bold">Whois service</h1>
+
+            <div class="col-lg-6 mx-auto">
+                <form class="p-4 p-md-5 border rounded-3 bg-light" onsubmit="return false;" id="form">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="floatingInput" placeholder="https://whois.jdecool.fr" required autofocus style="background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAASCAYAAABSO15qAAAAAXNSR0IArs4c6QAAAPhJREFUOBHlU70KgzAQPlMhEvoQTg6OPoOjT+JWOnRqkUKHgqWP4OQbOPokTk6OTkVULNSLVc62oJmbIdzd95NcuGjX2/3YVI/Ts+t0WLE2ut5xsQ0O+90F6UxFjAI8qNcEGONia08e6MNONYwCS7EQAizLmtGUDEzTBNd1fxsYhjEBnHPQNG3KKTYV34F8ec/zwHEciOMYyrIE3/ehKAqIoggo9inGXKmFXwbyBkmSQJqmUNe15IRhCG3byphitm1/eUzDM4qR0TTNjEixGdAnSi3keS5vSk2UDKqqgizLqB4YzvassiKhGtZ/jDMtLOnHz7TE+yf8BaDZXA509yeBAAAAAElFTkSuQmCC'); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%;" autocomplete="off">
+                        <label for="floatingInput">Domain</label>
+                    </div>
+                    <button class="w-100 btn btn-lg btn-primary" type="submit">Check this domain</button>
+                </form>
+            </div>
+
+            <div id="container-result" style="display: none;">
+                <hr>
+                <div class="col-lg-6 mx-auto">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#whois" type="button" role="tab" aria-controls="whois" aria-selected="true">Whois</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#dns" type="button" role="tab" aria-controls="dns" aria-selected="false">DNS</button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show active" id="whois" role="tabpanel" aria-labelledby="whois-tab">
+                            <div class="results-loader text-center" id="whois-result-loader">
+                                <div class="spinner-border" role="status"></div>
+                            </div>
+
+                            <div id="whois-result" style="text-align: left; display: none;"></div>
+                        </div>
+
+                        <div class="tab-pane fade" id="dns" role="tabpanel" aria-labelledby="dns-tab">
+                            <div class="results-loader text-center" id="dns-result-loader">>
+                                <div class="results-loader spinner-border" role="status"></div>
+                            </div>
+
+                            <div id="dns-result" style="text-align: left; display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const form = document.getElementById("form");
+                form.addEventListener("submit", () => {
+                    document.getElementById("container-result").style.display = "block";
+                    document.querySelectorAll(".results-loader").forEach(el => el.style.display = "block");
+
+                    const whoisContainer = document.getElementById("whois-result");
+                    whoisContainer.style.display = "none";
+
+                    const dnsContainer = document.getElementById("dns-result");
+                    dnsContainer.style.display = "none";
+
+                    const request = JSON.stringify({ "domain": document.getElementById("floatingInput").value });
+                    fetch("/whois", { method: "POST", body: request })
+                    .then(response => response.text())
+                    .then(data => {
+                        document.getElementById("whois-result-loader").style.display = "none";
+
+                        whoisContainer.style.display = "block";
+                        whoisContainer.innerHTML = `<pre>${data}</pre>`
+                    });
+
+                    fetch("/dns", { method: "POST", body: request })
+                    .then(response => response.text())
+                    .then(data => {
+                        document.getElementById("dns-result-loader").style.display = "none";
+
+                        dnsContainer.style.display = "block";
+                        dnsContainer.innerHTML = `<pre>${data}</pre>`
+                    });
+
+                    return false;
+                });
+            });
+        </script>
+    </body>
+</html>
