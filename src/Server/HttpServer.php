@@ -24,6 +24,7 @@ use React\Http\{
     Server,
 };
 use React\Socket\Server as Socket;
+use Sikei\React\Http\Middleware\CorsMiddleware;
 use Throwable;
 use function FastRoute\simpleDispatcher;
 
@@ -34,6 +35,7 @@ class HttpServer
     public function __construct(
         private Socket $socket,
         private LoopInterface $loop,
+        private CorsMiddleware $cors,
         private WhoisClient $client,
         private DnsClient $dns,
         callable $templateResolver,
@@ -105,21 +107,24 @@ class HttpServer
 
     public function run(): void
     {
-        $server = new Server(function(ServerRequestInterface $request) {
-            $route = $this->dispatcher->dispatch($request->getMethod(), $request->getUri()->getPath());
+        $server = new Server(
+            $this->cors,
+            function(ServerRequestInterface $request) {
+                $route = $this->dispatcher->dispatch($request->getMethod(), $request->getUri()->getPath());
 
-            switch ($route[0]) {
-                case Dispatcher::NOT_FOUND:
-                    return new Response(404, ['Content-Type' => 'text/plain'],  'Not found');
-                case Dispatcher::FOUND:
-                    $params = $route[2];
-                    return $route[1]($request, ... array_values($params));
-                case Dispatcher::METHOD_NOT_ALLOWED:
-                    return new Response(405, ['Content-Type' => 'text/plain'], 'Method not allowed');
-            }
+                switch ($route[0]) {
+                    case Dispatcher::NOT_FOUND:
+                        return new Response(404, ['Content-Type' => 'text/plain'],  'Not found');
+                    case Dispatcher::FOUND:
+                        $params = $route[2];
+                        return $route[1]($request, ... array_values($params));
+                    case Dispatcher::METHOD_NOT_ALLOWED:
+                        return new Response(405, ['Content-Type' => 'text/plain'], 'Method not allowed');
+                }
 
-            throw new LogicException('Something wrong with routing');
-        });
+                throw new LogicException('Something wrong with routing');
+            },
+        );
         $server->listen($this->socket);
 
         $this->loop->run();

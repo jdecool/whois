@@ -6,10 +6,26 @@ use function JDecool\Whois\Server\bootstrap;
 require __DIR__.'/../vendor/autoload.php';
 
 $defaultConfigurationFile = realpath(__DIR__.'/../conf/servers.json');
+$whoisServersConfigurationFile = getenv('CONFIGURATION_FILE') ?: $defaultConfigurationFile;
+echo "--> Using whois server configuration: $whoisServersConfigurationFile", PHP_EOL;
 
-bootstrap(
-    getenv('CONFIGURATION_FILE') ?: $defaultConfigurationFile,
+$defaultServerConfigurationFile = realpath(__DIR__.'/../conf/config.php.dist');
+$serverConfigurationFile = getenv('SERVER_CONFIGURATION_FILE') ?: $defaultServerConfigurationFile;
+$serverConfiguration = [];
+if ($serverConfigurationFile && file_exists($serverConfigurationFile)) {
+    $file = realpath($serverConfigurationFile);
+
+    echo "--> Load server configuration file: $file", PHP_EOL;
+    $serverConfiguration = require $file;
+}
+
+$app = bootstrap(
+    $serverConfiguration,
+    $whoisServersConfigurationFile,
     realpath(__DIR__.'/../public'),
-    getenv('IP') ?: '127.0.0.1',
-    (int) (getenv('PORT') ?: '80'),
-)->run();
+    $serverIp = (getenv('IP') ?: '127.0.0.1'),
+    $serverPort = ((int) (getenv('PORT') ?: '80')),
+);
+
+echo "--> Running server at $serverIp:$serverPort", PHP_EOL;
+$app->run();

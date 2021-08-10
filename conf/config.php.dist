@@ -1,0 +1,12 @@
+<?php
+
+return [
+    'cors' => [
+        'allow_credentials' => true,
+        'allow_origin' => ['*'],
+        'allow_methods' => ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS'],
+        'allow_headers' => ['DNT','X-Custom-Header','Keep-Alive','User-Agent','X-Requested-With','If-Modified-Since','Cache-Control','Content-Type','Content-Range','Range'],
+        'expose_headers' => ['DNT','X-Custom-Header','Keep-Alive','User-Agent','X-Requested-With','If-Modified-Since','Cache-Control','Content-Type','Content-Range','Range'],
+        'max_age' => 60 * 60 * 24 * 20, // preflight request is valid for 20 days
+    ],
+];

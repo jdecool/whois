@@ -12,10 +12,16 @@ use JDecool\Whois\{
 };
 use React\EventLoop\Loop;
 use React\Socket\Server;
+use Sikei\React\Http\Middleware\CorsMiddleware;
 use Spatie\Dns\Dns;
 
-function bootstrap(string $configurationFile, string $templateDirectory, string $ip, int $port): HttpServer
-{
+function bootstrap(
+    array $serverConfiguration,
+    string $configurationFile,
+    string $templateDirectory,
+    string $ip,
+    int $port,
+): HttpServer {
     $loop = Loop::get();
     $server = new Server(sprintf('%s:%d', $ip, $port), $loop);
 
@@ -24,6 +30,7 @@ function bootstrap(string $configurationFile, string $templateDirectory, string 
     return new HttpServer(
         $server,
         $loop,
+        new CorsMiddleware($serverConfiguration['cors'] ?? []),
         WhoisClient::fromConfiguration($configurationFile, new SocketFactory()),
         new DnsClient(new Dns()),
         static function (string $file) use ($templateDirectory): string {
