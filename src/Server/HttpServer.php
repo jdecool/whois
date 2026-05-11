@@ -20,10 +20,10 @@ use Psr\Http\{
 };
 use React\EventLoop\LoopInterface;
 use React\Http\{
+    HttpServer as ReactHttpServer,
     Message\Response,
-    Server,
 };
-use React\Socket\Server as Socket;
+use React\Socket\SocketServer as Socket;
 use Sikei\React\Http\Middleware\CorsMiddleware;
 use Throwable;
 use function FastRoute\simpleDispatcher;
@@ -107,7 +107,7 @@ class HttpServer
 
     public function run(): void
     {
-        $server = new Server(
+        $server = new ReactHttpServer(
             $this->cors,
             function(ServerRequestInterface $request) {
                 $route = $this->dispatcher->dispatch($request->getMethod(), $request->getUri()->getPath());

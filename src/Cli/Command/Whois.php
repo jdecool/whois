@@ -20,13 +20,13 @@ final class Whois extends Command
         parent::__construct('whois');
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument('domain', InputArgument::REQUIRED, 'Domain name to looking for');
         $this->setDescription('The Whois database contains details such as the registration date of the domain name, when it expires, ownership and contact information, nameserver information of the domain, the registrar via which the domain was purchased, etc.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln(
             $this->client->whois($input->getArgument('domain'))

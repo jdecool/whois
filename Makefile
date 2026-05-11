@@ -1,3 +1,3 @@
 .PHONY: run
 run:
-	PORT=8000 vendor/bin/php-watcher --signal SIGTERM bin/server
+	PORT=8000 php bin/server

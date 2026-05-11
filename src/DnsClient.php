@@ -23,7 +23,7 @@ final class DnsClient
         $records = $this->dns->getRecords($domain);
 
         return trim(
-            array_reduce($records, static fn (string $output, string $record): string => $output.$record.PHP_EOL, ''),
+            array_reduce($records, static fn (string $output, $record): string => $output.((string) $record).PHP_EOL, ''),
         );
     }
 }

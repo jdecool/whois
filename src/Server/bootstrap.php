@@ -11,7 +11,7 @@ use JDecool\Whois\{
     WhoisClient,
 };
 use React\EventLoop\Loop;
-use React\Socket\Server;
+use React\Socket\SocketServer;
 use Sikei\React\Http\Middleware\CorsMiddleware;
 use Spatie\Dns\Dns;
 
@@ -23,7 +23,7 @@ function bootstrap(
     int $port,
 ): HttpServer {
     $loop = Loop::get();
-    $server = new Server(sprintf('%s:%d', $ip, $port), $loop);
+    $server = new SocketServer(sprintf('%s:%d', $ip, $port));
 
     $templateDirectory = rtrim($templateDirectory, '/');
 

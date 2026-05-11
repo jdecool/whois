@@ -20,13 +20,13 @@ final class Dns extends Command
         parent::__construct('dns');
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument('domain', InputArgument::REQUIRED, 'Domain name to looking for');
         $this->setDescription('The Domain Name System (DNS) is a hierarchical and decentralized naming system for computers, services, or other resources connected to the Internet or a private network.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln(
             $this->client->resolve($input->getArgument('domain')),
